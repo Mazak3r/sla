@@ -24,20 +24,15 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/minitron:latest
 
-      # --- ADDED DEPLOYMENT STEP BELOW ---
       - name: SSH to Ubuntu Server and Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_PASSWORD }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/sla:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/minitron:latest
             docker stop minitron || true
             docker rm minitron || true
-            docker run -d \
-              --name minitron \
-              --restart always \
-              -p 5000:5000 \
-              ${{ secrets.DOCKER_USERNAME }}/minitron:latest
+            docker run -d --name minitron --restart always -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/minitron:latest
             docker image prune -f
